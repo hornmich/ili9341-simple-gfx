@@ -1,0 +1,203 @@
+/*
+ * Simple and slow graphic library without frame buffer.
+ *
+ * Author: Michal Horn
+ */
+
+#ifndef ILI9341_GFX_H_
+#define ILI9341_GFX_H_
+
+#include <ili9341.h>
+
+/**
+ * Definition of brush.
+ */
+typedef struct {
+	uint16_t bg_color; ///< Color used as background (clearing, filling)
+	uint16_t fg_color; ///< Color used for drawing (lines, borders)
+	uint8_t size; ///< Thickness of the line
+} ili_sgfx_brush_t;
+
+typedef struct {
+	uint8_t* data;
+	uint8_t width;
+	uint8_t height;
+} ili_sgfx_mono_bmp_t;
+
+typedef struct {
+	uint8_t* data;
+	uint8_t width;
+	uint8_t height;
+} ili_sgfx_rgb565_bmp_t;
+
+typedef struct {
+
+} ili_sgfx_font_t;
+
+/**
+ * Clear the screen with background color.
+ *
+ * Line thickness does not have any effect.
+ * Background color defines screen filling color.
+ * Foreground color does not have any effect.
+ *
+ * @param [in] desc Display driver instalce.
+ * @param [in] brush Brush to clear the screen.
+ */
+void ili_sgfx_clear_screen(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush);
+
+/**
+ * Draw vertical line with foreground color.
+ *
+ * Line thickness defines thickness of the line.
+ * Background color does not have any effect.
+ * Foreground color defines line color.
+ *
+ * @param [in] desc Display driver instance.
+ * @param [in] brush Brush to draw the line screen.
+ * @param [in] start Starting coordinates.
+ * @param [in] length Length of the line.
+ */
+void ili_sgfx_draw_v_line(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t start, int16_t lenght);
+
+/**
+ * Draw horizontal line with foreground color.
+ *
+ * Line thickness defines thickness of the line.
+ * Background color does not have any effect.
+ * Foreground color defines line color.
+ *
+ * @param [in] desc Display driver instance.
+ * @param [in] brush Brush to draw the line screen.
+ * @param [in] start Starting coordinates.
+ * @param [in] length Length of the line.
+ */
+void ili_sgfx_draw_h_line(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t start, int16_t lenght);
+
+/**
+ * Draw line with foreground color.
+ *
+ * This is very slow, use cautiously.
+ *
+ * Line thickness does not have any effect.
+ * Background color does not have any effect.
+ * Foreground color defines line color.
+ *
+ * @param [in] desc Display driver instance.
+ * @param [in] brush Brush to draw the line screen.
+ * @param [in] start Starting coordinates.
+ * @param [in] end Ending coordinates.
+ */
+void ili_sgfx_draw_line(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t start, coord_2d_t end);
+
+/**
+ * Draw rectangle with foreground color.
+ *
+ * The function is tolerant to swapping the coordinates. It always draws rectangle defined
+ * Sby the coordinates even when top/bottom/left/right is mixed.
+ *
+ * Line thickness defines thickness of the border.
+ * Background color does not have any effect.
+ * Foreground color defines border color.
+ *
+ * @param [in] desc Display driver instance.
+ * @param [in] brush Brush to draw the line screen.
+ * @param [in] top_left Top left corner of the rectangle
+ * @param [in] bottom_right Bottom right corner of the rectangle
+ */
+void ili_sgfx_draw_rect(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t top_left, coord_2d_t bottom_right);
+
+/**
+ * Draw rectangle by foreground color, filled by background color.
+ *
+ * The function is tolerant to swapping the coordinates. It always draws rectangle defined
+ * Sby the coordinates even when top/bottom/left/right is mixed.
+ *
+ * Line thickness defines thickness of the border.
+ * Background color defines filling color.
+ * Foreground color defines border color.
+ *
+ * @param [in] desc Display driver instance.
+ * @param [in] brush Brush to draw the line screen.
+ * @param [in] top_left Top left corner of the rectangle
+ * @param [in] bottom_right Bottom right corner of the rectangle
+ */
+void ili_sgfx_draw_filled_rect(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t top_left, coord_2d_t bottom_right);
+
+/**
+ * Draw rectangle by foreground color, with round corners.
+ *
+ * The function is tolerant to swapping the coordinates. It always draws rectangle defined
+ * Sby the coordinates even when top/bottom/left/right is mixed.
+ *
+ * NOT YET IMPLEMENTED
+ *
+ * @param [in] desc Display driver instance.
+ * @param [in] brush Brush to draw the line screen.
+ * @param [in] radius Corners radius.
+ * @param [in] top_left Top left corner of the rectangle
+ * @param [in] bottom_right Bottom right corner of the rectangle
+ */
+void ili_sgfx_draw_rect_round(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, uint8_t radius, coord_2d_t start, coord_2d_t end);
+
+/**
+ * Draw circle by foreground color
+ *
+ * NOT YET IMPLEMENTED
+ *
+ * @param [in] desc Display driver instance.
+ * @param [in] brush Brush to draw the line screen.
+ * @param [in] radius Corners radius.
+ * @param [in] center Center
+ */
+void ili_sgfx_draw_circle(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, uint8_t radius, coord_2d_t center);
+
+/**
+ * Draw circle by foreground color, filled by background color
+ *
+ * NOT YET IMPLEMENTED
+ *
+ * @param [in] desc Display driver instance.
+ * @param [in] brush Brush to draw the line screen.
+ * @param [in] radius Corners radius.
+ * @param [in] center Center
+ */
+void ili_sgfx_draw_filled_circle(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, uint8_t radius, coord_2d_t center);
+
+/**
+ * Draw single pixel by foreground color.
+ *
+ * Line thickness does not have any effect.
+ * Background color does not have any effect.
+ *
+ * @param [in] desc Display driver instance.
+ * @param [in] brush Brush to draw the line screen.
+ * @param [in] coord Pixel coordinates
+ */
+void ili_sgfx_draw_pixel(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t coord);
+
+/**
+ * https://www.silabs.com/community/wireless/proprietary/knowledge-base.entry.html/2019/02/14/creating_monochrome-ICUo
+ * Created GLIB mono stars_mono
+ *
+ * NOT YET IMPLEMENTED
+ *
+ */
+void ili_sgfx_draw_mono_bitmap(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t coord, const ili_sgfx_mono_bmp_t* bmp, bool transparent);
+
+/**
+ *
+ */
+void ili_sgfx_draw_RGB565_bitmap(const ili9341_desc_ptr_t desc, coord_2d_t coord, const ili_sgfx_rgb565_bmp_t* bmp);
+
+/**
+ * NOT YET IMPLEMENTED
+ */
+uint8_t ili_sgfx_putc(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t coord, const ili_sgfx_font_t* font, bool transparent, wchar_t c);
+
+/**
+ * NOT YET IMPLEMENTED
+ */
+uint8_t ili_sgfx_printf(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t coord, const ili_sgfx_font_t* font, bool transparent, const wchar_t *format, ...);
+
+#endif /* ILI9341_GFX_H_ */
