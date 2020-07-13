@@ -197,8 +197,8 @@ void ili_sgfx_draw_mono_bitmap(const ili9341_desc_ptr_t desc, const ili_sgfx_bru
 		uint8_t buffer[BUFFER_SIZE];
 		coord_2d_t top_left, bottom_right;
 		top_left = coord;
-		bottom_right.x = top_left.x + bmp->width;
-		bottom_right.y = top_left.y + bmp->height;
+		bottom_right.x = top_left.x + bmp->width - 1;
+		bottom_right.y = top_left.y + bmp->height - 1;
 		uint8_t bg_color_lsb = brush->bg_color&0xFF;
 		uint8_t bg_color_msb = (brush->bg_color>>8)&0xFF;
 		uint8_t fg_color_lsb = brush->fg_color&0xFF;
