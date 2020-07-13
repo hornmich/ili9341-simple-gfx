@@ -19,9 +19,9 @@ typedef struct {
 } ili_sgfx_brush_t;
 
 typedef struct {
-	uint8_t* data;
-	uint8_t width;
-	uint8_t height;
+	uint8_t* data;	///< Glib pixmap data
+	uint8_t width;	///< Image width
+	uint8_t height; ///< Image height
 	bool inverted;  ///< Pixmap data inverted
 } ili_sgfx_mono_bmp_t;
 
@@ -178,11 +178,25 @@ void ili_sgfx_draw_filled_circle(const ili9341_desc_ptr_t desc, const ili_sgfx_b
 void ili_sgfx_draw_pixel(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t coord);
 
 /**
- * https://www.silabs.com/community/wireless/proprietary/knowledge-base.entry.html/2019/02/14/creating_monochrome-ICUo
- * Created GLIB mono stars_mono
+ * Draw monochrome bitmap image.
  *
- * NOT YET IMPLEMENTED
+ * Function draws monochrome bitmap to specified position with brush foreground color.
  *
+ * The expected bitmap format is GLIB pixmap. Check out https://www.silabs.com/community/wireless/proprietary/knowledge-base.entry.html/2019/02/14/creating_monochrome-ICUo
+ * to learn how to generate pixmap sources.
+ *
+ * NOTE: The inverted parameter of the ili_sgfx_mono_bmp_t can be used to invert "on/off" pixels.
+ *
+ * If transparent parameter is set to True, The drawing will be much slower, but the pixels that should
+ * be "off" or "low" will be ignored, thus preserving the previously drawn images in that area.
+ * If the transparent parameter is set to False, the "off" or "low" pixels will be drawn with the background
+ * color.
+ *
+ * @param [in] desc Display driver instance.
+ * @param [in] brush Brush to draw pixmap. Foreground color used for "on/high" pixels, Background color used for "off/low" pixels, if transparent is not True.
+ * @param [in] coord Top left corner from where tha pixmal is drawn.
+ * @param [in] bmp Pixmap to be drawn.
+ * @param [in] transparent If True, then only "on/high" pixels will be drawn, which will make the procedure time consuming, but will preserve original background. If False, the foreground brush color will be used to draw "off/low" pixels.
  */
 void ili_sgfx_draw_mono_bitmap(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t coord, const ili_sgfx_mono_bmp_t* bmp, bool transparent);
 
