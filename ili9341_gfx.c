@@ -193,6 +193,7 @@ void ili_sgfx_draw_mono_bitmap(const ili9341_desc_ptr_t desc, const ili_sgfx_bru
 		}
 	}
 	else {
+		size *= 2 ; /* *2 because buffer is 16b*/
 		const uint32_t BUFFER_SIZE = 1024;
 		uint8_t buffer[BUFFER_SIZE];
 		coord_2d_t top_left, bottom_right;
