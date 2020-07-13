@@ -151,7 +151,7 @@ void ili_sgfx_draw_filled_rect(const ili9341_desc_ptr_t desc, const ili_sgfx_bru
 }
 
 
-void ili_sgfx_draw_rect_round(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, uint8_t radius, coord_2d_t start, coord_2d_t end) {
+void ili_sgfx_draw_rect_round(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, uint8_t radius, coord_2d_t top_left, coord_2d_t bottom_right) {
 
 }
 
@@ -161,7 +161,7 @@ void ili_sgfx_draw_circle(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t*
 }
 
 
-void ili_sgfx_draw_filled_circle(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, uint8_t border, uint8_t radius, coord_2d_t start) {
+void ili_sgfx_draw_filled_circle(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, uint8_t radius, coord_2d_t center) {
 
 }
 
