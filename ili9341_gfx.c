@@ -183,6 +183,9 @@ void ili_sgfx_draw_mono_bitmap(const ili9341_desc_ptr_t desc, const ili_sgfx_bru
 			uint8_t offset = i%8;
 			uint32_t index = i/8;
 			bool is_pixel = bmp->data[index] & (1<<(offset));
+			if (bmp->inverted) {
+				is_pixel = !is_pixel;
+			}
 			if (is_pixel) {
 				ili_sgfx_draw_pixel(desc, brush, position);
 			}
@@ -216,6 +219,9 @@ void ili_sgfx_draw_mono_bitmap(const ili9341_desc_ptr_t desc, const ili_sgfx_bru
 				uint8_t offset = imi%8;
 				uint32_t index = imi/8;
 				bool is_pixel = bmp->data[index] & (1<<(offset));
+				if (bmp->inverted) {
+					is_pixel = !is_pixel;
+				}
 				if (is_pixel) {
 					buffer[bi] = fg_color_msb;
 					buffer[bi+1] = fg_color_lsb;
@@ -231,6 +237,9 @@ void ili_sgfx_draw_mono_bitmap(const ili9341_desc_ptr_t desc, const ili_sgfx_bru
 			uint8_t offset = imi%8;
 			uint32_t index = imi/8;
 			bool is_pixel = bmp->data[index] & (1<<(offset));
+			if (bmp->inverted) {
+				is_pixel = !is_pixel;
+			}
 			if (is_pixel) {
 				buffer[bi] = fg_color_msb;
 				buffer[bi+1] = fg_color_lsb;

@@ -22,6 +22,7 @@ typedef struct {
 	uint8_t* data;
 	uint8_t width;
 	uint8_t height;
+	bool inverted;  ///< Pixmap data inverted
 } ili_sgfx_mono_bmp_t;
 
 typedef struct {
