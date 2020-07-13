@@ -186,7 +186,8 @@ void ili_sgfx_draw_mono_bitmap(const ili9341_desc_ptr_t desc, const ili_sgfx_bru
 			if (is_pixel) {
 				ili_sgfx_draw_pixel(desc, brush, position);
 			}
-			if (position.x >= coord.x + bmp->width) {
+			position.x++;
+			if (position.x > coord.x + bmp->width-1) {
 				position.x = coord.x;
 				position.y++;
 			}
