@@ -215,12 +215,12 @@ void ili_sgfx_draw_mono_bitmap(const ili9341_desc_ptr_t desc, const ili_sgfx_bru
 				uint32_t index = imi/8;
 				bool is_pixel = bmp->data[index] & (1<<(offset));
 				if (is_pixel) {
-					buffer[bi] = fg_color_lsb;
 					buffer[bi] = fg_color_msb;
+					buffer[bi+1] = fg_color_lsb;
 				}
 				else {
-					buffer[bi] = bg_color_lsb;
 					buffer[bi] = bg_color_msb;
+					buffer[bi+1] = bg_color_lsb;
 				}
 			}
 			ili9341_draw_RGB565_dma(desc, buffer, BUFFER_SIZE);
@@ -230,12 +230,12 @@ void ili_sgfx_draw_mono_bitmap(const ili9341_desc_ptr_t desc, const ili_sgfx_bru
 			uint32_t index = imi/8;
 			bool is_pixel = bmp->data[index] & (1<<(offset));
 			if (is_pixel) {
-				buffer[bi] = fg_color_lsb;
 				buffer[bi] = fg_color_msb;
+				buffer[bi+1] = fg_color_lsb;
 			}
 			else {
-				buffer[bi] = bg_color_lsb;
 				buffer[bi] = bg_color_msb;
+				buffer[bi+1] = bg_color_lsb;
 			}
 		}
 		ili9341_draw_RGB565_dma(desc, buffer, remaining_size);
