@@ -6,6 +6,9 @@
 
 #include "ili9341-gfx.h"
 
+#define BUFFER_SIZE  (1024)
+
+
 bool _ili_sgfx_is_pos_correct(const coord_2d_t* top_left, const coord_2d_t* bottom_right) {
 	return top_left->x <= bottom_right->x && top_left->y <= bottom_right->y;
 }
@@ -22,6 +25,34 @@ void _ili_sgfx_swap_coords(coord_2d_t* c1, coord_2d_t* c2) {
 	c1->y = c2->y;
 	c2->x = tmp.x;
 	c2->y = tmp.y;
+}
+
+uint32_t _ili_sgfx_draw_pixmap_chunk(const ili9341_desc_ptr_t desc, const ili_sgfx_mono_bmp_t* bmp, const ili_sgfx_brush_t* brush, uint32_t image_index, uint32_t chunk_size) {
+	uint8_t bg_color_lsb = brush->bg_color&0xFF;
+	uint8_t bg_color_msb = (brush->bg_color>>8)&0xFF;
+	uint8_t fg_color_lsb = brush->fg_color&0xFF;
+	uint8_t fg_color_msb = (brush->fg_color>>8)&0xFF;
+	uint8_t buffer[BUFFER_SIZE];
+
+	for (uint32_t bi = 0; bi < chunk_size; bi+=2, image_index++) {
+		uint8_t offset = image_index%8;
+		uint32_t index = image_index/8;
+		bool is_pixel = bmp->data[index] & (1<<(offset));
+		if (bmp->inverted) {
+			is_pixel = !is_pixel;
+		}
+		if (is_pixel) {
+			buffer[bi] = fg_color_msb;
+			buffer[bi+1] = fg_color_lsb;
+		}
+		else {
+			buffer[bi] = bg_color_msb;
+			buffer[bi+1] = bg_color_lsb;
+		}
+	}
+	ili9341_draw_RGB565_dma(desc, buffer, chunk_size);
+
+	return image_index;
 }
 
 /* Public functions definition */
@@ -171,7 +202,6 @@ void ili_sgfx_draw_pixel(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* 
 	ili9341_fill_region(desc, brush->fg_color);
 }
 
-
 void ili_sgfx_draw_mono_bitmap(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t coord, const ili_sgfx_mono_bmp_t* bmp, bool transparent) {
 
 	uint32_t size = bmp->height*bmp->width;
@@ -198,16 +228,11 @@ void ili_sgfx_draw_mono_bitmap(const ili9341_desc_ptr_t desc, const ili_sgfx_bru
 	}
 	else {
 		size *= 2 ; /* *2 because buffer is 16b*/
-		const uint32_t BUFFER_SIZE = 1024;
-		uint8_t buffer[BUFFER_SIZE];
+
 		coord_2d_t top_left, bottom_right;
 		top_left = coord;
 		bottom_right.x = top_left.x + bmp->width - 1;
 		bottom_right.y = top_left.y + bmp->height - 1;
-		uint8_t bg_color_lsb = brush->bg_color&0xFF;
-		uint8_t bg_color_msb = (brush->bg_color>>8)&0xFF;
-		uint8_t fg_color_lsb = brush->fg_color&0xFF;
-		uint8_t fg_color_msb = (brush->fg_color>>8)&0xFF;
 
 		ili9341_set_region(desc, top_left, bottom_right);
 		uint32_t segments_cnt = size / BUFFER_SIZE;
@@ -215,41 +240,9 @@ void ili_sgfx_draw_mono_bitmap(const ili9341_desc_ptr_t desc, const ili_sgfx_bru
 		uint32_t imi = 0;
 
 		for (uint32_t segment = 0; segment < segments_cnt; segment++) {
-			for (uint32_t bi = 0; bi < BUFFER_SIZE; bi+=2, imi++) {
-				uint8_t offset = imi%8;
-				uint32_t index = imi/8;
-				bool is_pixel = bmp->data[index] & (1<<(offset));
-				if (bmp->inverted) {
-					is_pixel = !is_pixel;
-				}
-				if (is_pixel) {
-					buffer[bi] = fg_color_msb;
-					buffer[bi+1] = fg_color_lsb;
-				}
-				else {
-					buffer[bi] = bg_color_msb;
-					buffer[bi+1] = bg_color_lsb;
-				}
-			}
-			ili9341_draw_RGB565_dma(desc, buffer, BUFFER_SIZE);
+			imi = _ili_sgfx_draw_pixmap_chunk(desc, bmp, brush, imi, BUFFER_SIZE);
 		}
-		for (uint32_t bi = 0; bi < remaining_size; bi+=2, imi++) {
-			uint8_t offset = imi%8;
-			uint32_t index = imi/8;
-			bool is_pixel = bmp->data[index] & (1<<(offset));
-			if (bmp->inverted) {
-				is_pixel = !is_pixel;
-			}
-			if (is_pixel) {
-				buffer[bi] = fg_color_msb;
-				buffer[bi+1] = fg_color_lsb;
-			}
-			else {
-				buffer[bi] = bg_color_msb;
-				buffer[bi+1] = bg_color_lsb;
-			}
-		}
-		ili9341_draw_RGB565_dma(desc, buffer, remaining_size);
+		imi = _ili_sgfx_draw_pixmap_chunk(desc, bmp, brush, imi, remaining_size);
 	}
 }
 
