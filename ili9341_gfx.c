@@ -313,8 +313,31 @@ void ili_sgfx_draw_RGB565_bitmap(const ili9341_desc_ptr_t desc, coord_2d_t coord
 }
 
 
-uint8_t ili_sgfx_putc(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t coord, const ili_sgfx_font_t* font, bool transparent, wchar_t c) {
+uint8_t ili_sgfx_putc(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t coord, const lw_font_t* font, bool transparent, wchar_t c) {
+	ili_sgfx_pixmap_t font_pixmap = {
+			.height = font->pixmap_height,
+			.width = font->pixmap_width,
+			.inverted = font->pixmap_inv,
+			.data = font->pixmap_data
+	};
 
+	for (int i = 0; i < font->chars_cnt; i++) {
+		if (c == font->characters[i].char_key) {
+			coord_2d_t dest_coord = {
+					.x = font->characters[i].char_def.rect_x,
+					.y = font->characters[i].char_def.rect_y
+			};
+			uint8_t width = font->characters[i].char_def.rect_w;
+			uint8_t height = font->characters[i].char_def.rect_h;
+
+			coord.x += font->characters[i].char_def.offset_x;
+			coord.y += font->characters[i].char_def.offset_y;
+
+			ili_sgfx_draw_pixmap_rect(desc, brush, &font_pixmap, transparent, coord, dest_coord, width, height);
+			return font->characters[i].char_def.width;
+		}
+	}
+	return 0;
 }
 
 

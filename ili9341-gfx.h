@@ -8,6 +8,7 @@
 #define ILI9341_GFX_H_
 
 #include <ili9341.h>
+#include "lw_font.h"
 
 /**
  * Definition of brush.
@@ -19,7 +20,7 @@ typedef struct {
 } ili_sgfx_brush_t;
 
 typedef struct {
-	uint8_t* data;	///< Glib pixmap data
+	const uint8_t* data;	///< Glib pixmap data
 	uint8_t width;	///< Image width
 	uint8_t height; ///< Image height
 	bool inverted;  ///< Pixmap data inverted
@@ -235,7 +236,7 @@ void ili_sgfx_draw_RGB565_bitmap(const ili9341_desc_ptr_t desc, coord_2d_t coord
 /**
  * NOT YET IMPLEMENTED
  */
-uint8_t ili_sgfx_putc(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t coord, const ili_sgfx_font_t* font, bool transparent, wchar_t c);
+uint8_t ili_sgfx_putc(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t coord, const lw_font_t* font, bool transparent, wchar_t c);
 
 /**
  * NOT YET IMPLEMENTED
