@@ -200,6 +200,32 @@ void ili_sgfx_draw_pixel(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* 
  */
 void ili_sgfx_draw_pixmap(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t coord, const ili_sgfx_pixmap_t* pixm, bool transparent);
 
+/**
+ * Draw rectangular part of larger pixmap.
+ *
+ * Function draws rectangular clip of larger pixmap to specified position with brush foreground color.
+ *
+ * If the clip size does not fit into the original image, the remainig image data will be filled with the last fitting pixel.
+ *
+ * The maximal size of the clip is defined by MAX_RECT_SIZE macro.
+ *
+ * The expected bitmap format is GLIB pixmap. Check out https://www.silabs.com/community/wireless/proprietary/knowledge-base.entry.html/2019/02/14/creating_monochrome-ICUo
+ * to learn how to generate pixmap sources.
+ *
+ * NOTE: The inverted parameter of the ili_sgfx_pixmap_t can be used to invert "on/off" pixels.
+ *
+ * If transparent parameter is set to True, The drawing will be much slower, but the pixels that should
+ * be "off" or "low" will be ignored, thus preserving the previously drawn images in that area.
+ * If the transparent parameter is set to False, the "off" or "low" pixels will be drawn with the background
+ * color.
+ *
+ * @param [in] desc Display driver instance.
+ * @param [in] brush Brush to draw pixmap. Foreground color used for "on/high" pixels, Background color used for "off/low" pixels, if transparent is not True.
+ * @param [in] coord Top left corner from where the pixmap is drawn.
+ * @param [in] bmp Pixmap to be drawn.
+ * @param [in] transparent If True, then only "on/high" pixels will be drawn, which will make the procedure time consuming, but will preserve original background. If False, the foreground brush color will be used to draw "off/low" pixels.
+ */
+void ili_sgfx_draw_pixmap_rect(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, const ili_sgfx_pixmap_t* pixm, bool transparent, coord_2d_t dest_coord, coord_2d_t src_coord, uint16_t width, uint16_t height);
 
 /**
  *

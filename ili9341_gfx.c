@@ -7,6 +7,7 @@
 #include "ili9341-gfx.h"
 
 #define BUFFER_SIZE  (1024)
+#define MAX_RECT_SIZE (16*16)
 
 
 bool _ili_sgfx_is_pos_correct(const coord_2d_t* top_left, const coord_2d_t* bottom_right) {
@@ -245,6 +246,59 @@ void ili_sgfx_draw_pixmap(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t*
 		imi = _ili_sgfx_draw_pixmap_chunk(desc, pixm, brush, imi, remaining_size);
 	}
 }
+
+void ili_sgfx_draw_pixmap_rect(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, const ili_sgfx_pixmap_t* pixm, bool transparent, coord_2d_t dest_coord, coord_2d_t src_coord, uint16_t width, uint16_t height) {
+	ili_sgfx_pixmap_t sub_pixmap = {
+			.height = height+1,
+			.width = width,
+			.inverted = pixm->inverted
+	};
+
+	uint16_t data_start_index = (src_coord.x + src_coord.y*pixm->width)/8;
+	uint16_t data_index = data_start_index;
+	uint8_t data_start_offset = (src_coord.x + src_coord.y*pixm->width) % 8;
+	uint8_t data_offset = data_start_offset;
+	uint8_t data_increment = pixm->width/8;
+	uint32_t orig_data_max_index = pixm->width*pixm->height / 8 - 1;
+
+	uint8_t buffer[MAX_RECT_SIZE];
+	uint16_t buffer_index = 0;
+	uint8_t buffer_offset = 0;
+	buffer[buffer_index] = 0;
+
+	for (int y = 0; y <= height; y++) {
+		for (int x = 0; x < width; x++) {
+			bool pixel = (pixm->data[data_index] >> data_offset) & 0x1;
+			buffer[buffer_index] |= pixel << buffer_offset;
+			data_offset++;
+			if (data_offset >= 8) {
+				data_offset = 0;
+				data_index++;
+				if (data_index > orig_data_max_index) {
+					data_index = orig_data_max_index;
+				}
+			}
+			buffer_offset++;
+			if (buffer_offset >= 8) {
+				buffer_offset = 0;
+				buffer_index++;
+				buffer[buffer_index] = 0;
+				if (buffer_index >= MAX_RECT_SIZE) {
+					buffer_index = MAX_RECT_SIZE-1;
+				}
+			}
+		}
+		data_index = data_start_index + y*data_increment;
+		data_offset = data_start_offset;
+		if (data_index > orig_data_max_index) {
+			data_index = orig_data_max_index;
+		}
+	}
+
+	sub_pixmap.data = buffer;
+	ili_sgfx_draw_pixmap(desc, brush, dest_coord, &sub_pixmap, transparent);
+}
+
 
 
 void ili_sgfx_draw_RGB565_bitmap(const ili9341_desc_ptr_t desc, coord_2d_t coord, const ili_sgfx_rgb565_bmp_t* bmp) {
