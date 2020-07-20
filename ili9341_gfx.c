@@ -5,6 +5,7 @@
  */
 
 #include "ili9341-gfx.h"
+#include "stdarg.h"
 
 #define BUFFER_SIZE  (1024)
 #define MAX_RECT_SIZE (16*16)
@@ -341,7 +342,42 @@ uint8_t ili_sgfx_putc(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* bru
 }
 
 
-uint8_t ili_sgfx_printf(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t coord, const ili_sgfx_font_t* font, bool transparent, const wchar_t *format, ...) {
+uint8_t ili_sgfx_printf(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t coord, const lw_font_t* font, bool transparent, const wchar_t *format, ...) {
+	va_list args;
+	va_start (args, format);
+	wchar_t buffer[64];
 
+	int ret_val = vswprintf(buffer, 64, format, args);
+	if (ret_val < 0) {
+		return 0;
+	}
+	else if (ret_val > 64) {
+		return 0;
+	}
+	va_end (args);
+
+	uint8_t shift = 0;
+	coord_2d_t orig_coord = coord;
+	for (int i = 0; i < wcslen(buffer); i++) {
+		if (buffer[i] == L'\n') {
+			coord.y += font->height;
+		}
+		else if (buffer[i] == L'\r') {
+			coord.x = orig_coord.x;
+		}
+		else {
+			shift = ili_sgfx_putc(desc, brush, coord, font, transparent, buffer[i]);
+			coord.x += shift;
+/*			if (i < wcslen(buffer)-1) {
+				next_c_width =
+			}
+			*/
+			if (coord.x > ili9341_get_screen_width(desc)) {
+				coord.y += font->height;
+			}
+		}
+	}
+
+	return coord.x - orig_coord.x;
 }
 
