@@ -27,7 +27,7 @@ void _ili_sgfx_swap_coords(coord_2d_t* c1, coord_2d_t* c2) {
 	c2->y = tmp.y;
 }
 
-uint32_t _ili_sgfx_draw_pixmap_chunk(const ili9341_desc_ptr_t desc, const ili_sgfx_mono_bmp_t* bmp, const ili_sgfx_brush_t* brush, uint32_t image_index, uint32_t chunk_size) {
+uint32_t _ili_sgfx_draw_pixmap_chunk(const ili9341_desc_ptr_t desc, const ili_sgfx_pixmap_t* pixm, const ili_sgfx_brush_t* brush, uint32_t image_index, uint32_t chunk_size) {
 	uint8_t bg_color_lsb = brush->bg_color&0xFF;
 	uint8_t bg_color_msb = (brush->bg_color>>8)&0xFF;
 	uint8_t fg_color_lsb = brush->fg_color&0xFF;
@@ -37,8 +37,8 @@ uint32_t _ili_sgfx_draw_pixmap_chunk(const ili9341_desc_ptr_t desc, const ili_sg
 	for (uint32_t bi = 0; bi < chunk_size; bi+=2, image_index++) {
 		uint8_t offset = image_index%8;
 		uint32_t index = image_index/8;
-		bool is_pixel = bmp->data[index] & (1<<(offset));
-		if (bmp->inverted) {
+		bool is_pixel = pixm->data[index] & (1<<(offset));
+		if (pixm->inverted) {
 			is_pixel = !is_pixel;
 		}
 		if (is_pixel) {
@@ -202,9 +202,9 @@ void ili_sgfx_draw_pixel(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* 
 	ili9341_fill_region(desc, brush->fg_color);
 }
 
-void ili_sgfx_draw_mono_bitmap(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t coord, const ili_sgfx_mono_bmp_t* bmp, bool transparent) {
+void ili_sgfx_draw_pixmap(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t coord, const ili_sgfx_pixmap_t* pixm, bool transparent) {
 
-	uint32_t size = bmp->height*bmp->width;
+	uint32_t size = pixm->height*pixm->width;
 
 	if (transparent) {
 		/* Slow, but will act as transparent. */
@@ -212,15 +212,15 @@ void ili_sgfx_draw_mono_bitmap(const ili9341_desc_ptr_t desc, const ili_sgfx_bru
 		for (uint32_t i = 0; i < size; i++) {
 			uint8_t offset = i%8;
 			uint32_t index = i/8;
-			bool is_pixel = bmp->data[index] & (1<<(offset));
-			if (bmp->inverted) {
+			bool is_pixel = pixm->data[index] & (1<<(offset));
+			if (pixm->inverted) {
 				is_pixel = !is_pixel;
 			}
 			if (is_pixel) {
 				ili_sgfx_draw_pixel(desc, brush, position);
 			}
 			position.x++;
-			if (position.x > coord.x + bmp->width-1) {
+			if (position.x > coord.x + pixm->width-1) {
 				position.x = coord.x;
 				position.y++;
 			}
@@ -231,8 +231,8 @@ void ili_sgfx_draw_mono_bitmap(const ili9341_desc_ptr_t desc, const ili_sgfx_bru
 
 		coord_2d_t top_left, bottom_right;
 		top_left = coord;
-		bottom_right.x = top_left.x + bmp->width - 1;
-		bottom_right.y = top_left.y + bmp->height - 1;
+		bottom_right.x = top_left.x + pixm->width - 1;
+		bottom_right.y = top_left.y + pixm->height - 1;
 
 		ili9341_set_region(desc, top_left, bottom_right);
 		uint32_t segments_cnt = size / BUFFER_SIZE;
@@ -240,9 +240,9 @@ void ili_sgfx_draw_mono_bitmap(const ili9341_desc_ptr_t desc, const ili_sgfx_bru
 		uint32_t imi = 0;
 
 		for (uint32_t segment = 0; segment < segments_cnt; segment++) {
-			imi = _ili_sgfx_draw_pixmap_chunk(desc, bmp, brush, imi, BUFFER_SIZE);
+			imi = _ili_sgfx_draw_pixmap_chunk(desc, pixm, brush, imi, BUFFER_SIZE);
 		}
-		imi = _ili_sgfx_draw_pixmap_chunk(desc, bmp, brush, imi, remaining_size);
+		imi = _ili_sgfx_draw_pixmap_chunk(desc, pixm, brush, imi, remaining_size);
 	}
 }
 
