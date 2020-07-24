@@ -23,15 +23,15 @@ typedef struct {
 
 typedef struct {
 	const uint8_t* data;	///< Glib pixmap data
-	uint8_t width;	///< Image width
-	uint8_t height; ///< Image height
+	uint16_t width;	///< Image width
+	uint16_t height; ///< Image height
 	bool inverted;  ///< Pixmap data inverted
 } ili_sgfx_pixmap_t;
 
 typedef struct {
 	uint8_t* data;
-	uint8_t width;
-	uint8_t height;
+	uint16_t width;
+	uint16_t height;
 } ili_sgfx_rgb565_bmp_t;
 
 typedef struct {
