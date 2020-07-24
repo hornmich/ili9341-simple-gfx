@@ -51,6 +51,20 @@ typedef struct {
 void ili_sgfx_clear_screen(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush);
 
 /**
+ * Clear rectangular part of the screen with background color.
+ *
+ * Line thickness does not have any effect.
+ * Background color defines screen filling color.
+ * Foreground color does not have any effect.
+ *
+ * @param [in] desc Display driver instalce.
+ * @param [in] top_left The top left corner of the area.
+ * @param [in] bottom_right The bottom right corner of the area.
+ * @param [in] brush Brush to clear the screen.
+ */
+void ili_sgfx_clear_region(const ili9341_desc_ptr_t desc, coord_2d_t top_left, coord_2d_t bottom_right, const ili_sgfx_brush_t* brush);
+
+/**
  * Draw vertical line with foreground color.
  *
  * Line thickness defines thickness of the line.

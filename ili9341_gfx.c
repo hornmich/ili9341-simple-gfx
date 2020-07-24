@@ -85,10 +85,13 @@ void ili_sgfx_clear_screen(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t
 	top_left.y = 0;
 	bottom_right.x = ili9341_get_screen_width(desc);
 	bottom_right.y = ili9341_get_screen_height(desc);
+	ili_sgfx_clear_region(desc, top_left, bottom_right, brush);
+}
+
+void ili_sgfx_clear_region(const ili9341_desc_ptr_t desc, coord_2d_t top_left, coord_2d_t bottom_right, const ili_sgfx_brush_t* brush) {
 	ili9341_set_region(desc, top_left, bottom_right);
 	ili9341_fill_region(desc, brush->bg_color);
 }
-
 
 void ili_sgfx_draw_v_line(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t start, int16_t lenght) {
 	coord_2d_t top_left, bottom_right;
