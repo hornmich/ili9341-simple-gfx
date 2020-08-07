@@ -1,0 +1,4 @@
+[submodule "fonts/lw-font-c-gen"]
+	path = fonts/lw-font-c-gen
+	url = git@github.com:hornmich/lw-font-C-gen.git
+	branch = main
