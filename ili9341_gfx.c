@@ -342,18 +342,16 @@ uint8_t ili_sgfx_putc(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* bru
 }
 
 
-uint8_t ili_sgfx_printf(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t coord, const lw_font_t* font, bool transparent, const wchar_t *format, ...) {
+int ili_sgfx_printf(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t coord, const lw_font_t* font, bool transparent, const wchar_t *format, ...) {
 	va_list args;
 	va_start (args, format);
-	wchar_t buffer[64];
+	wchar_t buffer[STR_MAX_LEN];
 
-	int ret_val = vswprintf(buffer, 64, format, args);
+	int ret_val = vswprintf(buffer, STR_MAX_LEN, format, args);
 	if (ret_val < 0) {
-		return 0;
+		return ret_val;
 	}
-	else if (ret_val > 64) {
-		return 0;
-	}
+
 	va_end (args);
 
 	uint8_t shift = 0;
@@ -378,6 +376,6 @@ uint8_t ili_sgfx_printf(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* b
 		}
 	}
 
-	return coord.x - orig_coord.x;
+	return ret_val;
 }
 

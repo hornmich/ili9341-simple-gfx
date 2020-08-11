@@ -10,6 +10,8 @@
 #include <ili9341.h>
 #include "lw_font.h"
 
+#define STR_MAX_LEN (256)
+
 /**
  * Definition of brush.
  */
@@ -241,6 +243,6 @@ uint8_t ili_sgfx_putc(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* bru
 /**
  * NOT YET IMPLEMENTED
  */
-uint8_t ili_sgfx_printf(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t coord, const lw_font_t* font, bool transparent, const wchar_t *format, ...);
+int ili_sgfx_printf(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t coord, const lw_font_t* font, bool transparent, const wchar_t *format, ...);
 
 #endif /* ILI9341_GFX_H_ */
