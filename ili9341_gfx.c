@@ -9,14 +9,34 @@
 
 #define BUFFER_SIZE  (1024)
 #define MAX_RECT_SIZE (16*16)
+#define NO_FIT (0x00)
+#define FITS (0xFF)
+#define FITS_V (0x0F)
+#define FITS_H (0xF0)
 
 
 bool _ili_sgfx_is_pos_correct(const coord_2d_t* top_left, const coord_2d_t* bottom_right) {
 	return top_left->x <= bottom_right->x && top_left->y <= bottom_right->y;
 }
 
-bool _ili_sgfx_fits_to_screen() {
-	return true;
+uint8_t _ili_sgfx_fits_to_screen(const ili9341_desc_ptr_t desc, const coord_2d_t* top_left, const coord_2d_t* bottom_right) {
+	uint8_t ret_val = NO_FIT;
+
+	if (!_ili_sgfx_is_pos_correct(top_left, bottom_right)) {
+		return NO_FIT;
+	}
+
+	uint16_t scr_w = ili9341_get_screen_width(desc);
+	uint16_t scr_h = ili9341_get_screen_height(desc);
+
+	if (top_left->x < scr_w && bottom_right->x < scr_w) {
+		ret_val |= FITS_H;
+	}
+	if (top_left->y < scr_h && bottom_right->y < scr_h) {
+		ret_val |= FITS_V;
+	}
+
+	return ret_val;
 }
 
 void _ili_sgfx_swap_coords(coord_2d_t* c1, coord_2d_t* c2) {
