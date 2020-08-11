@@ -336,32 +336,40 @@ void ili_sgfx_draw_RGB565_bitmap(const ili9341_desc_ptr_t desc, coord_2d_t coord
 
 uint8_t ili_sgfx_putc(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t coord, const lw_font_t* font, bool transparent, wchar_t c) {
 
-	for (int i = 0; i < font->chars_cnt; i++) {
-		if (c == font->chars[i].char_code) {
-			uint8_t width = font->chars[i].char_def.width;
-			uint8_t height = font->chars[i].char_def.height;
-
-			coord.x += font->chars[i].char_def.offset_x;
-			coord.y += font->chars[i].char_def.offset_y;
-			if (font->chars[i].char_def.pixmap != NULL) {
-				ili_sgfx_pixmap_t font_pixmap = {
-						.height = height,
-						.width = width,
-						.inverted = font->inv,
-						.data = font->chars[i].char_def.pixmap
-				};
-
-
-				ili_sgfx_draw_pixmap(desc, brush, coord, &font_pixmap, transparent);
-			}
-			return width + font->chars[i].char_def.offset_x;
-		}
+	const lw_char_def_t* char_def = lw_get_char(font, c);
+	if (char_def == NULL) {
+		return 0;
 	}
-	return 0;
+
+	uint8_t width = char_def->width;
+	uint8_t height = char_def->height;
+	uint8_t scr_width = width + char_def->offset_x;
+	uint8_t scr_height = height + char_def->offset_y;
+	coord_2d_t top_left = {.x = coord.x, .y = coord.y};
+	coord_2d_t bottom_right = {.x = coord.x + scr_width, .y = coord.y + scr_height};
+	uint8_t fitting = _ili_sgfx_fits_to_screen(desc, &top_left, &bottom_right);
+	if (fitting == NO_FIT) {
+		return 0;
+	}
+
+	coord.x += char_def->offset_x;
+	coord.y += char_def->offset_y;
+	if (char_def->pixmap != NULL) {
+		ili_sgfx_pixmap_t font_pixmap = {
+				.height = height,
+				.width = width,
+				.inverted = font->inv,
+				.data = char_def->pixmap
+		};
+
+
+		ili_sgfx_draw_pixmap(desc, brush, coord, &font_pixmap, transparent);
+	}
+	return scr_width;
 }
 
 
-int ili_sgfx_printf(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t coord, const lw_font_t* font, bool transparent, const wchar_t *format, ...) {
+int ili_sgfx_printf(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush, coord_2d_t* coord, const lw_font_t* font, bool transparent, const wchar_t *format, ...) {
 	va_list args;
 	va_start (args, format);
 	wchar_t buffer[STR_MAX_LEN];
@@ -374,24 +382,28 @@ int ili_sgfx_printf(const ili9341_desc_ptr_t desc, const ili_sgfx_brush_t* brush
 	va_end (args);
 
 	uint8_t shift = 0;
-	coord_2d_t orig_coord = coord;
+	coord_2d_t orig_coord = *coord;
 	for (int i = 0; i < wcslen(buffer); i++) {
 		if (buffer[i] == L'\n') {
-			coord.y += font->height;
+			coord->y += font->height;
 		}
 		else if (buffer[i] == L'\r') {
-			coord.x = orig_coord.x;
+			coord->x = orig_coord.x;
 		}
 		else {
-			shift = ili_sgfx_putc(desc, brush, coord, font, transparent, buffer[i]);
-			coord.x += shift;
-/*			if (i < wcslen(buffer)-1) {
-				next_c_width =
+			shift = ili_sgfx_putc(desc, brush, *coord, font, transparent, buffer[i]);
+			coord->x += shift;
+			if (i < wcslen(buffer)) {
+				const lw_char_def_t* char_def = lw_get_char(font, buffer[i+1]);
+				if (char_def != NULL && char_def->width + coord->x > ili9341_get_screen_width(desc)) {
+					coord->y += font->height;
+					coord->x = orig_coord.x;
+				}
 			}
-			*/
-			if (coord.x > ili9341_get_screen_width(desc)) {
-				coord.y += font->height;
-			}
+			/*if (coord->x > ili9341_get_screen_width(desc)) {
+				coord->y += font->height;
+				coord->x = orig_coord.x;
+			}*/
 		}
 	}
 
