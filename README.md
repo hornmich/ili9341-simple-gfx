@@ -1,10 +1,10 @@
 # ili9341-simple-gfx
-Basic graphics library for [ILI9341 SPI](https://bitbucket-prod.tcc.etn.com/projects/SID/repos/ili9341-spi-driver/browse) driven displays, using no frame buffer.
+Basic graphics library for [ILI9341 SPI]() driven displays, using no frame buffer.
 
 ## Features
 
 This is a basic library for drawing simple shapes and images. The library is designed 
-to be used together with the [ili9341-spi-driver](https://bitbucket-prod.tcc.etn.com/projects/SID/repos/ili9341-spi-driver/browse).
+to be used together with the [ili9341-spi-driver]().
 
 The library is using a concept called *brush*. Brush defines the colors used for foreground
 and background and line thickness.
@@ -19,6 +19,8 @@ The following features are implemented:
 * Draw general line (other then horizotal/vertical)
 * Draw pixmap (1b color depth image)
 * Draw RGB565 bitmap (16b color depth image)
+* Put UTF-8 characters on screen
+* Print UTF-8 strings on screen
 
 ### Clear screen
 
@@ -56,10 +58,18 @@ color (fast) or left as transparent (slow).
 
 Draws 16b RGB565 bitmap.
 
+### Put UTF-8 character
+
+Draws lw-font generated pixmap character on the screen coordinates.
+
+### Print UTF-8 strings
+
+Prints formated string in a C printf fashion from lw-font generated pixmap font on the screen coordinates.
+
 ## Usage
 
 Installing and running the driver consists of the follwing steps:
-* Install and setup the [ili9341-spi-driver](https://bitbucket-prod.tcc.etn.com/projects/SID/repos/ili9341-spi-driver/browse)
+* Install and setup the [ili9341-spi-driver]()
 * Clone the repository to your project, possibly as a submodule for easy updating.
 * Register the path to the *ili9341-gfx.h* header file to your toolchain
 * Include the main header file ili9341-gfx.h
@@ -112,4 +122,4 @@ The possible usage may look like that:
 
 ## Examples
 
-[ili9341-simple-gfx](https://bitbucket-prod.tcc.etn.com/projects/SID/repos/ili9341-simple-gfx-example/browse)
+[ili9341-simple-gfx]()
