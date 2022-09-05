@@ -69,7 +69,7 @@ Prints formated string in a C printf fashion from lw-font generated pixmap font 
 ## Usage
 
 Installing and running the driver consists of the follwing steps:
-* Install and setup the [ili9341-spi-driver]()
+* Install and setup the [ili9341-spi-driver](https://github.com/hornmich/ili9341-spi-driver)
 * Clone the repository to your project, possibly as a submodule for easy updating.
 * Register the path to the *ili9341-gfx.h* header file to your toolchain
 * Include the main header file ili9341-gfx.h
@@ -122,4 +122,4 @@ The possible usage may look like that:
 
 ## Examples
 
-[ili9341-simple-gfx]()
+[ili9341-simple-gfx](https://github.com/hornmich/ili9341-simple-gfx)
